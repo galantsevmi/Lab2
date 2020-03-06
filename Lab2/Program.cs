@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Diagnostics;
+using System.Xml.Serialization;
 
 namespace Lab2
 {
@@ -34,22 +36,48 @@ namespace Lab2
             File.Create("objects.xml").Close();
             try
             {
+                Trace.WriteLine("Вызов метода ReadFileIntoString класса FileActions");
                 FileActions.ReadFileIntoString(inputPath, out inputString);
+                Trace.WriteLine("Вызов метода WriteCoefficientsIntoArray класса FileActions");
                 FileActions.WriteCoefficientsIntoArray(inputString, out equals);
                 for (int i = 0; i < equals.Length; i++)
                 {
                     switch (equals[i].Count)
                     {
                         case 3:
+                            Trace.WriteLine("Вызов конструктора метода Line");
                             Line lineFunction = new Line(equals[i][0], equals[i][1]);
+                            XmlSerializer serializerLine = new XmlSerializer(typeof(Line));
+                            using (StreamWriter sw = new StreamWriter("objects.xml", true, System.Text.Encoding.Default))
+                            {
+                                serializerLine.Serialize(sw, lineFunction);
+                                sw.WriteLine("\n");
+                            }
+                            Trace.WriteLine("Вызов метода WriteDoubleToTheEndOfFile класса FileActions и метода Solve класса Line");
                             FileActions.WriteDoubleToTheEndOfFile(outputPath, lineFunction.Solve(equals[i][2]));
                             break;
                         case 4:
+                            Trace.WriteLine("Вызов конструктора метода Quadratic");
                             Quadratic quadraticFunction = new Quadratic(equals[i][0], equals[i][1], equals[i][2]);
+                            XmlSerializer serializerQuadratic = new XmlSerializer(typeof(Quadratic));
+                            using (StreamWriter sw = new StreamWriter("objects.xml", true, System.Text.Encoding.Default))
+                            {
+                                serializerQuadratic.Serialize(sw, quadraticFunction);
+                                sw.WriteLine("\n");
+                            }
+                            Trace.WriteLine("Вызов метода WriteDoubleToTheEndOfFile класса FileActions и метода Solve класса Quadratic");
                             FileActions.WriteDoubleToTheEndOfFile(outputPath, quadraticFunction.Solve(equals[i][3]));
                             break;
                         case 5:
+                            Trace.WriteLine("Вызов конструктора метода Cubic");
                             Cubic cubicFunction = new Cubic(equals[i][0], equals[i][1], equals[i][2], equals[i][3]);
+                            XmlSerializer serializerCubic = new XmlSerializer(typeof(Cubic));
+                            using (StreamWriter sw = new StreamWriter("objects.xml", true, System.Text.Encoding.Default))
+                            {
+                                serializerCubic.Serialize(sw, cubicFunction);
+                                sw.WriteLine("\n");
+                            }
+                            Trace.WriteLine("Вызов метода WriteDoubleToTheEndOfFile класса FileActions и метода Solve класса Cubic");
                             FileActions.WriteDoubleToTheEndOfFile(outputPath, cubicFunction.Solve(equals[i][4]));
                             break;
                         default:
@@ -83,6 +111,7 @@ namespace Lab2
             }
             finally
             {
+                Trace.Flush();
                 Console.WriteLine("Нажмите любую клавишу для завершения программы");
                 Console.ReadKey();
             };
@@ -125,12 +154,14 @@ namespace Lab2
             this.b = b;
         }
 
+        public Line() { }
+
         /// <summary>
         /// Находит значение функции в точке x
         /// </summary>
         /// <param name="x">Значение точки, в которой ищется значение функции</param>
         /// <returns>Значение функции</returns>
-        public override double Solve (double x)
+        public override double Solve(double x)
         {
             return this.a * x + this.b;
         }
@@ -162,12 +193,14 @@ namespace Lab2
             this.c = c;
         }
 
+        public Quadratic() { }
+
         /// <summary>
         /// Находит значение функции в точке x
         /// </summary>
         /// <param name="x">Значение точки, в которой ищется значение функции</param>
         /// <returns>Значение функции</returns>
-        public override double Solve (double x)
+        public override double Solve(double x)
         {
             return this.a * Math.Pow(x, 2) + this.b * x + this.c;
         }
@@ -201,12 +234,13 @@ namespace Lab2
             this.d = d;
         }
 
+        public Cubic() { }
         /// <summary>
         /// Находит значение функции в точке x
         /// </summary>
         /// <param name="x">Значение точки, в которой ищется значение функции</param>
         /// <returns>Значение функции</returns>
-        public override double Solve (double x)
+        public override double Solve(double x)
         {
             return this.a * Math.Pow(x, 3) + this.b * Math.Pow(x, 2) + this.c * x + this.d;
         }
@@ -263,7 +297,7 @@ namespace Lab2
             string[] functions = input.Substring(funcStartPosition).Split('\n');
 
             if (functions.Length != n)
-            
+
             {
                 throw new FormatException();
             }
